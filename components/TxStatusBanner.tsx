@@ -1,26 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { TxState } from '@/types';
-import {
-  Settings,
-  PenLine,
-  Upload,
-  RefreshCw,
-  CheckCircle2,
-  XCircle,
-  ExternalLink,
-} from 'lucide-react';
+import type { TxState } from '../types/index';
+import { Settings, PenLine, Upload, RefreshCw, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 
 interface TxStatusBannerProps {
   txState: TxState;
   onDismiss?: () => void;
 }
 
-const STAGE_CONFIG: Record<
-  string,
-  { icon: React.ReactNode; label: string; colorClass: string }
-> = {
+const STAGE_CONFIG: Record<string, { icon: React.ReactNode; label: string; colorClass: string }> = {
   building: {
     icon: <Settings size={16} className="animate-spin" />,
     label: 'Building transaction...',
@@ -53,17 +42,9 @@ const STAGE_CONFIG: Record<
   },
 };
 
-const HORIZON_URL =
-  process.env.NEXT_PUBLIC_HORIZON_URL ?? 'https://horizon-testnet.stellar.org';
-
-/**
- * Animated banner that shows the current transaction lifecycle stage.
- * Auto-dismisses 5 seconds after a successful transaction.
- */
 export function TxStatusBanner({ txState, onDismiss }: TxStatusBannerProps) {
   const { status, txHash, error } = txState;
 
-  // Auto-dismiss on success after 5 seconds
   useEffect(() => {
     if (status === 'success' && onDismiss) {
       const timer = setTimeout(onDismiss, 5000);
@@ -72,13 +53,10 @@ export function TxStatusBanner({ txState, onDismiss }: TxStatusBannerProps) {
   }, [status, onDismiss]);
 
   if (status === 'idle') return null;
-
   const config = STAGE_CONFIG[status];
   if (!config) return null;
 
-  const expertUrl = txHash
-    ? `https://stellar.expert/explorer/testnet/tx/${txHash}`
-    : null;
+  const expertUrl = txHash ? `https://stellar.expert/explorer/testnet/tx/${txHash}` : null;
 
   return (
     <div
@@ -89,9 +67,7 @@ export function TxStatusBanner({ txState, onDismiss }: TxStatusBannerProps) {
       <span className="mt-0.5 shrink-0">{config.icon}</span>
       <div className="flex-1 min-w-0">
         <span className="font-medium">
-          {status === 'failed' && error
-            ? `Failed: ${error}`
-            : config.label}
+          {status === 'failed' && error ? `Failed: ${error}` : config.label}
         </span>
         {status === 'success' && expertUrl && (
           <a
@@ -100,22 +76,12 @@ export function TxStatusBanner({ txState, onDismiss }: TxStatusBannerProps) {
             rel="noopener noreferrer"
             className="ml-2 inline-flex items-center gap-1 text-xs underline opacity-75 hover:opacity-100"
           >
-            View on Stellar Expert
-            <ExternalLink size={11} />
+            View on Stellar Expert <ExternalLink size={11} />
           </a>
-        )}
-        {status === 'success' && txHash && !expertUrl && (
-          <span className="ml-2 font-mono text-xs opacity-60">
-            {txHash.slice(0, 12)}...
-          </span>
         )}
       </div>
       {onDismiss && (
-        <button
-          onClick={onDismiss}
-          className="shrink-0 text-current opacity-50 hover:opacity-100"
-          aria-label="Dismiss"
-        >
+        <button onClick={onDismiss} className="shrink-0 text-current opacity-50 hover:opacity-100" aria-label="Dismiss">
           ×
         </button>
       )}

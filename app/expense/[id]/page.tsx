@@ -3,25 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useWalletContext } from '@/context/WalletContext';
-import { BalanceTable } from '@/components/BalanceTable';
-import { SettleButton } from '@/components/SettleButton';
-import { getExpense, getSettlements, isSettled } from '@/lib/contract';
-import type { Expense, Settlement } from '@/types';
-import {
-  stroopsToXlm,
-  truncateAddress,
-  formatTimestamp,
-} from '@/lib/stellar-utils';
-import {
-  ArrowLeft,
-  User,
-  Clock,
-  DollarSign,
-  History,
-} from 'lucide-react';
+import { useWalletContext } from '../../../context/WalletContext';
+import { BalanceTable } from '../../../components/BalanceTable';
+import { SettleButton } from '../../../components/SettleButton';
+import { getExpense, getSettlements, isSettled } from '../../../lib/contract';
+import type { Expense, Settlement } from '../../../types/index';
+import { stroopsToXlm, truncateAddress, formatTimestamp } from '../../../lib/stellar-utils';
+import { ArrowLeft, User, Clock, DollarSign, History } from 'lucide-react';
 
-/** Loading skeleton */
 function DetailSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
@@ -49,10 +38,8 @@ export default function ExpenseDetailPage() {
     try {
       const exp = await getExpense(expenseId);
       setExpense(exp);
-
       const settleList = await getSettlements(expenseId);
       setSettlements(settleList);
-
       if (publicKey) {
         const alreadySettled = await isSettled(expenseId, publicKey);
         setSettled(alreadySettled);
@@ -65,19 +52,12 @@ export default function ExpenseDetailPage() {
   }
 
   useEffect(() => {
-    if (!isNaN(expenseId)) {
-      loadAll();
-    }
+    if (!isNaN(expenseId)) loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expenseId, publicKey]);
 
-  const isParticipant =
-    publicKey &&
-    expense?.participants.some((p) => p.address === publicKey);
-
+  const isParticipant = publicKey && expense?.participants.some((p) => p.address === publicKey);
   const isOpen = expense?.status === 'Open';
-
-  // ── Render states ──────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -101,10 +81,7 @@ export default function ExpenseDetailPage() {
           <p className="mt-1 text-sm text-slate-500">
             The expense with ID #{expenseId} does not exist on-chain.
           </p>
-          <Link
-            href="/"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300"
-          >
+          <Link href="/" className="mt-4 inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300">
             <ArrowLeft size={13} /> Go to dashboard
           </Link>
         </div>
@@ -114,11 +91,7 @@ export default function ExpenseDetailPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      {/* Back link */}
-      <Link
-        href="/"
-        className="flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-300"
-      >
+      <Link href="/" className="flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-300">
         <ArrowLeft size={14} />
         Back to dashboard
       </Link>
@@ -139,8 +112,6 @@ export default function ExpenseDetailPage() {
             {expense.status}
           </span>
         </div>
-
-        {/* Meta row */}
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">
           <span className="flex items-center gap-1.5">
             <User size={13} />
@@ -165,13 +136,11 @@ export default function ExpenseDetailPage() {
 
       {/* Balance table */}
       <div className="space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-          Balances
-        </h2>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Balances</h2>
         <BalanceTable expense={expense} currentUser={publicKey} />
       </div>
 
-      {/* Settle section — only for participants on open expenses */}
+      {/* Settle section */}
       {isParticipant && isOpen && (
         <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-3">
           <h2 className="text-sm font-semibold text-slate-300">Your Settlement</h2>
@@ -179,10 +148,7 @@ export default function ExpenseDetailPage() {
             expenseId={expense.id}
             settler={publicKey!}
             settled={settled}
-            onSuccess={() => {
-              setSettled(true);
-              loadAll();
-            }}
+            onSuccess={() => { setSettled(true); loadAll(); }}
           />
         </div>
       )}
@@ -195,7 +161,6 @@ export default function ExpenseDetailPage() {
             Settlement History
           </h2>
         </div>
-
         {settlements.length === 0 ? (
           <p className="rounded-xl border border-dashed border-slate-800 py-6 text-center text-sm text-slate-600">
             No settlements recorded yet.
@@ -203,10 +168,7 @@ export default function ExpenseDetailPage() {
         ) : (
           <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
             {settlements.map((s, i) => (
-              <div
-                key={i}
-                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3"
-              >
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs text-slate-300">
                     {s.settler === publicKey ? 'you' : truncateAddress(s.settler)}
@@ -216,9 +178,7 @@ export default function ExpenseDetailPage() {
                     {stroopsToXlm(s.amount)} XLM
                   </span>
                 </div>
-                <span className="text-xs text-slate-600">
-                  {formatTimestamp(s.settledAt)}
-                </span>
+                <span className="text-xs text-slate-600">{formatTimestamp(s.settledAt)}</span>
               </div>
             ))}
           </div>

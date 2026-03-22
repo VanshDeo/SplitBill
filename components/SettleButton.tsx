@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import type { TxState } from '@/types';
+import type { TxState } from '../types/index';
 import { TxStatusBanner } from './TxStatusBanner';
-import { settleExpense } from '@/lib/contract';
+import { settleExpense } from '../lib/contract';
 import { CheckCircle2, Loader2, CreditCard } from 'lucide-react';
 
 interface SettleButtonProps {
@@ -15,16 +15,7 @@ interface SettleButtonProps {
 
 const IDLE_TX: TxState = { status: 'idle', txHash: null, error: null };
 
-/**
- * Button to settle a participant's share of an expense.
- * Shows the full transaction lifecycle via TxStatusBanner.
- */
-export function SettleButton({
-  expenseId,
-  settler,
-  settled,
-  onSuccess,
-}: SettleButtonProps) {
+export function SettleButton({ expenseId, settler, settled, onSuccess }: SettleButtonProps) {
   const [txState, setTxState] = useState<TxState>(IDLE_TX);
 
   const inFlight =
@@ -35,7 +26,7 @@ export function SettleButton({
   async function handleSettle() {
     setTxState(IDLE_TX);
     try {
-      const hash = await settleExpense(expenseId, settler, (s) =>
+      const hash = await settleExpense(settler, expenseId, (s) =>
         setTxState((prev) => ({ ...prev, status: s }))
       );
       setTxState({ status: 'success', txHash: hash, error: null });
@@ -65,18 +56,10 @@ export function SettleButton({
         disabled={inFlight}
         className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {inFlight ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          <CreditCard size={16} />
-        )}
+        {inFlight ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
         {inFlight ? 'Processing...' : 'Settle My Share'}
       </button>
-
-      <TxStatusBanner
-        txState={txState}
-        onDismiss={() => setTxState(IDLE_TX)}
-      />
+      <TxStatusBanner txState={txState} onDismiss={() => setTxState(IDLE_TX)} />
     </div>
   );
 }

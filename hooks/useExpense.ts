@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { Expense, Settlement, TxState, CreateExpenseParams } from '@/types';
-import * as contract from '@/lib/contract';
-import { xlmToStroops } from '@/lib/stellar-utils';
+import type { Expense, Settlement, TxState, CreateExpenseParams } from '../types/index';
+import * as contract from '../lib/contract';
+import { xlmToStroops } from '../lib/stellar-utils';
 
 interface UseExpenseReturn {
   expense: Expense | null;
@@ -27,10 +27,6 @@ interface UseExpenseReturn {
 
 const IDLE_TX: TxState = { status: 'idle', txHash: null, error: null };
 
-/**
- * Hook that provides all expense-related data and actions.
- * Manages the full transaction lifecycle state for mutations.
- */
 export function useExpense(): UseExpenseReturn {
   const [expense, setExpense] = useState<Expense | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -142,9 +138,8 @@ export function useExpense(): UseExpenseReturn {
     async (expenseId: number, settler: string) => {
       setTxState(IDLE_TX);
       try {
-        const hash = await contract.settleExpense(expenseId, settler, setTxStatus);
+        const hash = await contract.settleExpense(settler, expenseId, setTxStatus);
         setTxState({ status: 'success', txHash: hash, error: null });
-        // Re-fetch expense to reflect the update
         await fetchExpense(expenseId);
         await fetchSettlements(expenseId);
       } catch (e) {

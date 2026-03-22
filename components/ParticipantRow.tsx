@@ -1,6 +1,6 @@
 'use client';
 
-import { isValidStellarAddress } from '@/lib/stellar-utils';
+import { isValidStellarAddress } from '../lib/stellar-utils';
 import { X } from 'lucide-react';
 
 interface ParticipantRowProps {
@@ -13,10 +13,6 @@ interface ParticipantRowProps {
   showRemove: boolean;
 }
 
-/**
- * A single participant input row in the CreateExpenseForm.
- * Validates Stellar address format on blur.
- */
 export function ParticipantRow({
   index,
   address,
@@ -26,8 +22,7 @@ export function ParticipantRow({
   onRemove,
   showRemove,
 }: ParticipantRowProps) {
-  const addressInvalid =
-    address.length > 0 && !isValidStellarAddress(address);
+  const addressInvalid = address.length > 0 && !isValidStellarAddress(address);
 
   return (
     <div className="flex items-start gap-2">
@@ -38,19 +33,14 @@ export function ParticipantRow({
           value={address}
           onChange={(e) => onAddressChange(index, e.target.value)}
           className={`w-full rounded-md border bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-            addressInvalid
-              ? 'border-red-500/50 focus:ring-red-500'
-              : 'border-slate-700'
+            addressInvalid ? 'border-red-500/50 focus:ring-red-500' : 'border-slate-700'
           }`}
           aria-label={`Participant ${index + 1} address`}
         />
         {addressInvalid && (
-          <p className="text-xs text-red-400">
-            Must be a valid Stellar address (G... 56 chars)
-          </p>
+          <p className="text-xs text-red-400">Must be a valid Stellar address (G... 56 chars)</p>
         )}
       </div>
-
       <div className="w-32 shrink-0">
         <input
           type="number"
@@ -63,7 +53,6 @@ export function ParticipantRow({
           aria-label={`Participant ${index + 1} amount`}
         />
       </div>
-
       <div className="w-8 shrink-0 pt-2">
         {showRemove && (
           <button

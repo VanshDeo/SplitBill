@@ -1,14 +1,10 @@
 'use client';
 
-import { useWalletContext } from '@/context/WalletContext';
-import { truncateAddress } from '@/lib/stellar-utils';
+import { useWalletContext } from '../context/WalletContext';
+import { truncateAddress } from '../lib/stellar-utils';
 import { Wallet, LogOut, AlertTriangle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
-/**
- * Wallet connection button shown in the nav bar.
- * Shows connect, connected state, or wrong-network warning.
- */
 export function ConnectWallet() {
   const { publicKey, isConnected, isCorrectNetwork, connect, disconnect } =
     useWalletContext();
@@ -21,9 +17,7 @@ export function ConnectWallet() {
     try {
       await connect();
     } catch (e) {
-      setConnectError(
-        e instanceof Error ? e.message : 'Failed to connect wallet'
-      );
+      setConnectError(e instanceof Error ? e.message : 'Failed to connect wallet');
     } finally {
       setConnecting(false);
     }
@@ -73,16 +67,10 @@ export function ConnectWallet() {
         disabled={connecting}
         className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {connecting ? (
-          <Loader2 size={14} className="animate-spin" />
-        ) : (
-          <Wallet size={14} />
-        )}
+        {connecting ? <Loader2 size={14} className="animate-spin" /> : <Wallet size={14} />}
         {connecting ? 'Connecting...' : 'Connect Freighter'}
       </button>
-      {connectError && (
-        <p className="text-xs text-red-400">{connectError}</p>
-      )}
+      {connectError && <p className="text-xs text-red-400">{connectError}</p>}
     </div>
   );
 }

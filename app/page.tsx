@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { useWalletContext } from '@/context/WalletContext';
-import { useExpense } from '@/hooks/useExpense';
-import { ExpenseCard } from '@/components/ExpenseCard';
-import { balanceLabel } from '@/lib/stellar-utils';
+import { useWalletContext } from '../context/WalletContext';
+import { useExpense } from '../hooks/useExpense';
+import { ExpenseCard } from '../components/ExpenseCard';
+import { balanceLabel } from '../lib/stellar-utils';
 import { PlusCircle, Wallet, TrendingUp, LayoutGrid } from 'lucide-react';
 
 /** Loading skeleton for expense cards */

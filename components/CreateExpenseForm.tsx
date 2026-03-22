@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWalletContext } from '@/context/WalletContext';
-import { useExpense } from '@/hooks/useExpense';
-import { isValidStellarAddress } from '@/lib/stellar-utils';
+import { useWalletContext } from '../context/WalletContext';
+import { useExpense } from '../hooks/useExpense';
+import { isValidStellarAddress } from '../lib/stellar-utils';
 import { ParticipantRow } from './ParticipantRow';
 import { TxStatusBanner } from './TxStatusBanner';
 import { PlusCircle, Receipt } from 'lucide-react';
-import type { CreateExpenseParams } from '@/types';
+import type { CreateExpenseParams } from '../types/index';
 
 interface ParticipantEntry {
   address: string;
@@ -17,10 +17,6 @@ interface ParticipantEntry {
 
 const MAX_PARTICIPANTS = 10;
 
-/**
- * Multi-step form for creating a new group expense on-chain.
- * Includes live sum validation and full tx lifecycle feedback.
- */
 export function CreateExpenseForm() {
   const router = useRouter();
   const { publicKey } = useWalletContext();
@@ -33,7 +29,6 @@ export function CreateExpenseForm() {
     { address: '', amountOwed: '' },
   ]);
 
-  // ── Live sum validation ──────────────────────────────────────────────────
   const participantSum = useMemo(
     () =>
       participants.reduce((acc, p) => {
@@ -47,16 +42,13 @@ export function CreateExpenseForm() {
   const remainder = Math.round((total - participantSum) * 10_000_000) / 10_000_000;
   const sumsMatch = Math.abs(remainder) < 0.0001;
 
-  // ── Address validation ────────────────────────────────────────────────────
   const allAddressesValid = participants.every(
     (p) => p.address.length > 0 && isValidStellarAddress(p.address)
   );
-
   const allAmountsValid = participants.every((p) => {
     const v = parseFloat(p.amountOwed);
     return !isNaN(v) && v > 0;
   });
-
   const hasDuplicateAddresses =
     new Set(participants.map((p) => p.address)).size !== participants.length;
 
@@ -69,7 +61,6 @@ export function CreateExpenseForm() {
     !hasDuplicateAddresses &&
     txState.status === 'idle';
 
-  // ── Participant list helpers ──────────────────────────────────────────────
   function updateAddress(index: number, value: string) {
     setParticipants((prev) =>
       prev.map((p, i) => (i === index ? { ...p, address: value } : p))
@@ -83,15 +74,14 @@ export function CreateExpenseForm() {
   }
 
   function addParticipant() {
-    if (participants.length >= MAX_PARTICIPANTS) return;
-    setParticipants((prev) => [...prev, { address: '', amountOwed: '' }]);
+    if (participants.length < MAX_PARTICIPANTS)
+      setParticipants((prev) => [...prev, { address: '', amountOwed: '' }]);
   }
 
   function removeParticipant(index: number) {
     setParticipants((prev) => prev.filter((_, i) => i !== index));
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!publicKey || !canSubmit) return;
@@ -109,7 +99,7 @@ export function CreateExpenseForm() {
       const expenseId = await createExpense(params, publicKey);
       router.push(`/expense/${expenseId}`);
     } catch {
-      // Error already captured in txState
+      // Error captured in txState
     }
   }
 
@@ -124,9 +114,7 @@ export function CreateExpenseForm() {
       <div className="space-y-1.5">
         <label htmlFor="description" className="block text-sm font-medium text-slate-300">
           Description
-          <span className="ml-1 text-xs text-slate-500">
-            ({description.length}/100)
-          </span>
+          <span className="ml-1 text-xs text-slate-500">({description.length}/100)</span>
         </label>
         <input
           id="description"
@@ -161,16 +149,13 @@ export function CreateExpenseForm() {
       {/* Participants */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-slate-300">
-            Participants
-          </label>
+          <label className="text-sm font-medium text-slate-300">Participants</label>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>Address</span>
             <span className="w-32 text-right">Amount (XLM)</span>
             <span className="w-8" />
           </div>
         </div>
-
         <div className="space-y-2">
           {participants.map((p, i) => (
             <ParticipantRow
@@ -185,7 +170,6 @@ export function CreateExpenseForm() {
             />
           ))}
         </div>
-
         {participants.length < MAX_PARTICIPANTS && (
           <button
             type="button"
@@ -196,7 +180,6 @@ export function CreateExpenseForm() {
             Add Participant
           </button>
         )}
-
         {hasDuplicateAddresses && (
           <p className="text-xs text-red-400">Duplicate participant addresses detected.</p>
         )}
@@ -214,22 +197,15 @@ export function CreateExpenseForm() {
           {sumsMatch ? (
             <span>Amounts balance correctly.</span>
           ) : remainder > 0 ? (
-            <span>
-              Remaining to assign:{' '}
-              <strong>{remainder.toFixed(7)} XLM</strong>
-            </span>
+            <span>Remaining to assign: <strong>{remainder.toFixed(7)} XLM</strong></span>
           ) : (
-            <span>
-              Over by: <strong>{Math.abs(remainder).toFixed(7)} XLM</strong>
-            </span>
+            <span>Over by: <strong>{Math.abs(remainder).toFixed(7)} XLM</strong></span>
           )}
         </div>
       )}
 
-      {/* Transaction status */}
       <TxStatusBanner txState={txState} onDismiss={clearTxState} />
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={!canSubmit || inFlight}

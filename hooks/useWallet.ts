@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { connectWallet, checkWalletConnection, EXPECTED_PASSPHRASE } from '@/lib/wallet';
+import { connectWallet, checkWalletConnection, EXPECTED_PASSPHRASE } from '../lib/wallet';
 
 interface UseWalletReturn {
   publicKey: string | null;
@@ -11,23 +11,14 @@ interface UseWalletReturn {
   disconnect: () => void;
 }
 
-/**
- * Hook that manages Freighter wallet connection state.
- * Checks for an existing connection on mount.
- */
 export function useWallet(): UseWalletReturn {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [isCorrectNetwork, setIsCorrectNetwork] = useState(true);
 
-  // Check for an existing connection on mount
   useEffect(() => {
     checkWalletConnection()
-      .then((pk) => {
-        if (pk) setPublicKey(pk);
-      })
-      .catch(() => {
-        // Silently fail — Freighter may not be installed
-      });
+      .then((pk) => { if (pk) setPublicKey(pk); })
+      .catch(() => {});
   }, []);
 
   const connect = useCallback(async () => {

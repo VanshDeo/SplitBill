@@ -1,7 +1,7 @@
 'use client';
 
-import type { Expense } from '@/types';
-import { stroopsToXlm, truncateAddress } from '@/lib/stellar-utils';
+import type { Expense } from '../types/index';
+import { stroopsToXlm, truncateAddress } from '../lib/stellar-utils';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 interface BalanceTableProps {
@@ -9,10 +9,6 @@ interface BalanceTableProps {
   currentUser: string | null;
 }
 
-/**
- * Table showing all participants, their amounts owed, and settlement status.
- * Highlights the current user's row.
- */
 export function BalanceTable({ expense, currentUser }: BalanceTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-800">
