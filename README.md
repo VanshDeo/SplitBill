@@ -1,5 +1,15 @@
 # SplitBill
 
+## Deployed Contract Information
+**Contract Address:** `CDQADOY7NYK2FQA42QBCTC367EV3XFJKFT3SFVIFZQ2B4Q34UIUN2DEV`
+
+### Screenshots
+**Dashboard:**
+![Dashboard](screenshots/Dashboard%20image.png)
+
+**Stellar Lab:**
+![Stellar Lab](screenshots/Stellar%20image.png)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
 
 ## Built with v0

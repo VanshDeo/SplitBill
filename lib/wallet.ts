@@ -31,11 +31,11 @@ export async function connectWallet(): Promise<WalletInfo> {
   }
 
   await freighter.requestAccess();
-  const pkResult = await freighter.getPublicKey();
+  const pkResult = await freighter.getAddress();
   const publicKey =
     typeof pkResult === 'string'
       ? pkResult
-      : (pkResult as { publicKey: string }).publicKey;
+      : (pkResult as { address: string }).address || (pkResult as any).publicKey;
 
   const details = await freighter.getNetworkDetails();
   const networkPassphrase =
@@ -65,11 +65,11 @@ export async function checkWalletConnection(): Promise<string | null> {
 
     if (!isConnected) return null;
 
-    const pkResult = await freighter.getPublicKey();
+    const pkResult = await freighter.getAddress();
     const publicKey =
       typeof pkResult === 'string'
         ? pkResult
-        : (pkResult as { publicKey: string }).publicKey;
+        : (pkResult as { address: string }).address || (pkResult as any).publicKey;
 
     return publicKey || null;
   } catch {

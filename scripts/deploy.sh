@@ -21,13 +21,12 @@ CONTRACT_ID=$(stellar contract deploy \
 echo "Deployed! Contract ID: $CONTRACT_ID"
 
 # Write to frontend env
-mkdir -p frontend
-cat > frontend/.env <<EOF
+cat > .env <<EOF
 NEXT_PUBLIC_CONTRACT_ID=$CONTRACT_ID
 NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 NEXT_PUBLIC_RPC_URL=https://soroban-testnet.stellar.org
 NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
 EOF
 
-echo "Contract ID saved to frontend/.env"
+echo "Contract ID saved to .env"
 echo "CONTRACT_ID=$CONTRACT_ID"
